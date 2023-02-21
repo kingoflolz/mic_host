@@ -1,0 +1,28 @@
+[package]
+name = "mic_host"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "mic_host"
+crate-type = ["cdylib"]
+
+[profile.release]
+debug = true
+
+[dependencies]
+pyo3 = { version = "0.17.3", features = ["extension-module"] }
+numpy = "0.17"
+ndrustfft = "0.3.0"
+ndarray = { version = "0.15", features = ["rayon", "blas"] }
+bitvec = "1"
+byteorder = "1"
+npy = "0.4.0"
+socket2 = "0.4.7"
+crossbeam = "0.8.2"
+realfft = "3.2.0"
+lazy_static = "1.4.0"
+rustfft = "6.1.0"
+itertools = "0.10.5"
+rayon = "1.6.1"
