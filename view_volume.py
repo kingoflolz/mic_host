@@ -44,11 +44,10 @@ volume1 = scene.visuals.Volume(data_queue.get(),
                                interpolation="gaussian",
                                )
 volume1.cmap = TransFire()
-
 # volume1.cmap = TransGrays()
 
-mic_pos = source.cal.mic_pos.cpu().numpy() / (1600 / 32)
-mic_pos += np.array([32, 32, 0])
+mic_pos = source.cal.mic_pos.cpu().numpy() / (1600 / 24)
+mic_pos += np.array([24, 24, 0])
 mic_pos = mic_pos[:, [2, 0, 1]]
 point_cloud.set_data(mic_pos, edge_width=0, face_color=(0, 1, 0, 1), size=3)
 point_cloud.order = -1

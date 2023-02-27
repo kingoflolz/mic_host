@@ -120,7 +120,7 @@ def kernel(
         out_incoherent_energy += incoherent_energy
         out_coherent_energy += coherent_energy
 
-    tl.atomic_add(out + n_offsets, out_coherent_energy)
+    tl.atomic_add(out + n_offsets, out_coherent_energy * out_coherent_energy / out_incoherent_energy)
 
 
 def kernel_fn(mic_data, mic_pos, dist_min, k, window_size, output_pos, f_start=None, f_end=None):

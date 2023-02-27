@@ -13,7 +13,7 @@ from kernel import kernel_fn_fast
 
 
 class DataSource:
-    def __init__(self, shape, ax_lims, window_size=16 * 1024):
+    def __init__(self, shape, ax_lims, window_size=16 * 1024, raw_out=None):
         self.window_size = window_size
 
         self.shape = shape
@@ -24,7 +24,7 @@ class DataSource:
 
         grid = torch.stack(torch.meshgrid(x, y, z), dim=-1).permute([1, 0, 2, 3]).reshape(-1, 3).cuda()
 
-        cal = CalModel(200).cuda()
+        cal = CalModel(400).cuda()
         cal.load_state_dict(torch.load("calibration.pt"))
         self.cal = cal
 
@@ -34,7 +34,7 @@ class DataSource:
         self.freq_ranges = [
             (500,  1700),
             (1700, 3000),
-            (3000, 8000),
+            (3000, 10000),
             # (500,  10000),
         ]
 
@@ -46,10 +46,12 @@ class DataSource:
 
         self.mic_indexes = [
             list(itertools.chain(*rings[3:8])) + rings[1][::6] + rings[2][3::6],
-            list(itertools.chain(*rings[2:7])) + rings[1][::6] + rings[7][3::6],
-            list(itertools.chain(*rings[0:5])) + rings[5][::6] + rings[6][3::6],
+            list(itertools.chain(*rings[2:7])) + rings[1][::3],
+            list(itertools.chain(*rings[0:5])) + rings[5][::3],
             # list(itertools.chain(*rings))
         ]
+
+        self.raw_out = raw_out
 
         def mic_set_cache(mic_pos):
             out = {}
@@ -78,6 +80,9 @@ class DataSource:
             while True:
                 chunk = self.push_queue.get()
                 chunk = clean_bad_mics2(chunk)
+                if self.raw_out is not None:
+                    self.raw_out.put(chunk)
+
                 rfft = self.corr.rfft(chunk)
                 rfft = torch.from_numpy(rfft)[:, :self.freq_idx_ranges.max()].cuda()
 
@@ -150,7 +155,7 @@ class DataSource:
 
 class DataSource3D(DataSource):
     def __init__(self):
-        super().__init__(shape=(64, 64, 64), ax_lims=((-1600, 1600), (-1600, 1600), (0, 3200)))
+        super().__init__(shape=(48, 48, 48), ax_lims=((-1600, 1600), (-1600, 1600), (0, 3200)))
 
     def post_process(self, data):
         d_min = data.min()
@@ -174,5 +179,5 @@ class DataSource2D(DataSource):
 
 
 if __name__ == "__main__":
-    ds = DataSource()
+    ds = DataSource3D()
     ds.plot_arrays()

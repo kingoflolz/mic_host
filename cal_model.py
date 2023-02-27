@@ -52,4 +52,6 @@ class CalModel(nn.Module):
         # deviation of mic_pos from starting_mic_pos
         mic_pos_err = (self.mic_pos - self.starting_mic_pos).abs().mean()
 
-        return time_err + mic_pos_err * 0.1, time_err, mic_pos_err
+        jerk = torch.diff(self.source_pos, dim=0, n=3).norm(dim=1).mean()
+
+        return time_err + mic_pos_err * 0.5 + jerk * 0.01, time_err, mic_pos_err, jerk

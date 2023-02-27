@@ -93,6 +93,7 @@ impl RawListener {
             let mut buf = [0; 2048];
             let mut socket = Socket::new(Domain::IPV4, Type::DGRAM, None).unwrap();
             socket.set_recv_buffer_size(128 * 1024 * 1024).unwrap();
+            assert!(socket.recv_buffer_size().unwrap() > 128 * 1024 * 1024);
 
             let address: SocketAddr = addr.parse().unwrap();
             socket.bind(&address.into()).unwrap();
